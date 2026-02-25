@@ -48,6 +48,7 @@ The framework includes:
 - `scripts/`                            — tooling scripts
   - `run-tests.js`                      — cross-platform test runner
   - `generate-report.js`                — converts JUnit XML to HTML report
+  - `fix-junit.js`                      — fixes JUnit XML structure for CircleCI
 - `docs/`                               — documentation
   - `test-plan.md`                      — test plan and coverage matrix
   - `defects.md`                        — defect log

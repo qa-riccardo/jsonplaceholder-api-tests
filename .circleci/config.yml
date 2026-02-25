@@ -1,0 +1,37 @@
+version: 2.1
+
+jobs:
+  test:
+    docker:
+      - image: cimg/node:22.16
+    working_directory: ~/project
+    steps:
+      - checkout
+
+      - run:
+          name: Show Node/NPM versions
+          command: |
+            node -v
+            npm -v
+
+      - run:
+          name: Install dependencies
+          command: npm ci --registry=https://registry.npmjs.org
+
+      - run:
+          name: Run tests and generate JUnit
+          command: |
+            node scripts/run-tests.js --report
+            node scripts/fix-junit.js
+
+      - store_test_results:
+          path: test-results
+
+      - store_artifacts:
+          path: test-results
+          destination: test-results
+
+workflows:
+  test_and_report:
+    jobs:
+      - test

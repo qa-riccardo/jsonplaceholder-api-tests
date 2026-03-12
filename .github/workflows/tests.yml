@@ -46,33 +46,9 @@ jobs:
       - name: Notify Slack
         if: always()
         run: |
-          STATUS="${{ job.status }}"
-          if [ "$STATUS" = "success" ]; then ICON="✅"; COLOR="good"; else ICON="❌"; COLOR="danger"; fi
-
-          XML="test-results/junit.xml"
-          if [ -f "$XML" ]; then
-            TOTAL=$(grep -oP '(?<=<!-- tests )\d+' "$XML" || echo "?")
-            PASS=$(grep -oP '(?<=<!-- pass )\d+' "$XML" || echo "?")
-            FAIL=$(grep -oP '(?<=<!-- fail )\d+' "$XML" || echo "?")
-            SKIP=$(grep -oP '(?<=<!-- skipped )\d+' "$XML" || echo "?")
-            DURATION_MS=$(grep -oP '(?<=<!-- duration_ms )[\d.]+' "$XML" || echo "0")
-            DURATION=$(echo "scale=2; $DURATION_MS / 1000" | bc)s
-          else
-            TOTAL="?"; PASS="?"; FAIL="?"; SKIP="?"; DURATION="?s"
-          fi
-
+          node scripts/slack-payload.js \
+            "${{ job.status }}" \
+            "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
           curl -s -X POST "${{ secrets.SLACK_WEBHOOK_URL }}" \
             -H "Content-Type: application/json" \
-            -d "{
-              \"attachments\": [{
-                \"color\": \"$COLOR\",
-                \"title\": \"$ICON API Tests — $STATUS\",
-                \"fields\": [
-                  {\"title\": \"✅ Passed\",  \"value\": \"$PASS\",     \"short\": true},
-                  {\"title\": \"❌ Failed\",  \"value\": \"$FAIL\",     \"short\": true},
-                  {\"title\": \"⏭️ Skipped\", \"value\": \"$SKIP\",     \"short\": true},
-                  {\"title\": \"⏱️ Duration\",\"value\": \"$DURATION\", \"short\": true}
-                ],
-                \"footer\": \"Trigger: ${{ github.event_name }} | Branch: ${{ github.ref_name }} | <${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|View run>\"
-              }]
-            }"
+            -d @test-results/slack-payload.json

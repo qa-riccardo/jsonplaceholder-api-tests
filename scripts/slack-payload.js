@@ -29,10 +29,10 @@ if (existsSync('test-results/junit.xml')) {
     const time = parseFloat((block.match(/\btime="([^"]*)"/) || [])[1] ?? '0');
     const ms   = Math.round(time * 1000);
 
-    let icon;
-    if (/<failure/.test(block) || /<error/.test(block)) icon = '❌';
-    else if (/<skipped/.test(block))                    icon = '⏭️';
-    else                                                icon = '✅';
+    let icon, label;
+    if (/<failure/.test(block) || /<error/.test(block)) { icon = '❌'; label = 'Failed';  }
+    else if (/<skipped/.test(block))                    { icon = '⏭️'; label = 'Skipped'; }
+    else                                                { icon = '✅'; label = 'Passed';  }
 
     tests.push({ name, ms, label, icon });
   }

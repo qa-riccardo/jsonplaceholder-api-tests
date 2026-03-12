@@ -24,6 +24,8 @@ jobs:
 
       - name: Run tests
         run: npm run test:ci
+        env:
+          FORCE_COLOR: '1'
 
       - name: Upload test results
         if: always()
@@ -31,3 +33,11 @@ jobs:
         with:
           name: test-results
           path: test-results/
+
+      - name: Publish test report
+        if: always()
+        uses: dorny/test-reporter@v1
+        with:
+          name: Test Results
+          path: test-results/junit.xml
+          reporter: jest-junit

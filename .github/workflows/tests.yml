@@ -9,6 +9,9 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
+    permissions:
+      checks: write
+      contents: read
 
     steps:
       - uses: actions/checkout@v4
@@ -41,3 +44,7 @@ jobs:
           name: Test Results
           path: test-results/junit.xml
           reporter: jest-junit
+
+      - name: Write step summary
+        if: always()
+        run: node scripts/generate-summary.js

@@ -34,11 +34,33 @@ if (existsSync('test-results/junit.xml')) {
     else if (/<skipped/.test(block))                    icon = '⏭️';
     else                                                icon = '✅';
 
-    tests.push(`${icon} ${name} _(${ms}ms)_`);
+    tests.push({ name, ms, label, icon });
   }
 }
 
-const testList = tests.join('\n') || '_No test data available_';
+const failedTests  = tests.filter(t => t.label === 'Failed');
+const skippedTests = tests.filter(t => t.label === 'Skipped');
+
+// Detail block: only failed tests (or a short skipped note if all pass)
+const detailBlocks = [];
+
+if (failedTests.length > 0) {
+  const lines = failedTests.map(t => `❌ ${t.name} _(${t.ms}ms)_`).join('\n');
+  detailBlocks.push({ type: 'divider' });
+  detailBlocks.push({
+    type: 'section',
+    text: { type: 'mrkdwn', text: `*Failed Tests*\n${lines}` },
+  });
+}
+
+if (skippedTests.length > 0 && failedTests.length === 0) {
+  const lines = skippedTests.map(t => `⏭️ ${t.name}`).join('\n');
+  detailBlocks.push({ type: 'divider' });
+  detailBlocks.push({
+    type: 'section',
+    text: { type: 'mrkdwn', text: `*Skipped*\n${lines}` },
+  });
+}
 
 const payload = {
   blocks: [
@@ -53,20 +75,19 @@ const payload = {
         text: `✅ *${passed}* passed   •   ❌ *${failed}* failed   •   ⏭️ *${skipped}* skipped   •   ⏱️ *${duration}*`,
       },
     },
-    { type: 'divider' },
-    {
-      type: 'section',
-      text: { type: 'mrkdwn', text: `*Test Details*\n${testList}` },
-    },
-    ...(runUrl ? [{
-      type: 'actions',
-      elements: [{
-        type: 'button',
-        text: { type: 'plain_text', text: '🔗 View run on GitHub', emoji: true },
-        url: runUrl,
-        style: jobStatus === 'success' ? 'primary' : 'danger',
-      }],
-    }] : []),
+    ...detailBlocks,
+    ...(runUrl ? [
+      { type: 'divider' },
+      {
+        type: 'actions',
+        elements: [{
+          type: 'button',
+          text: { type: 'plain_text', text: '🔗 View run on GitHub', emoji: true },
+          url: runUrl,
+          style: jobStatus === 'success' ? 'primary' : 'danger',
+        }],
+      },
+    ] : []),
   ],
 };
 

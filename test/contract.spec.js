@@ -55,6 +55,11 @@ liveTest('contract (live): comment shape has all required fields with correct ty
   }
 });
 
+// Intentionally failing test to verify CI/Slack failure reporting
+test('DEMO FAIL: this test is intentionally broken', () => {
+  assert.equal(1, 2, 'Expected failure for demo purposes');
+});
+
 // Deterministic contract test: schema parsing catches a non-array response
 test('contract (mock): non-array users response -> throws ValidationError', async () => {
   const mock = createMockServer({

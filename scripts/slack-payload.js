@@ -22,9 +22,9 @@ const tests = [];
 if (existsSync('test-results/junit.xml')) {
   const xml = readFileSync('test-results/junit.xml', 'utf8');
 
-  passed   = (xml.match(/<!--\s*pass (\d+)/)        || [])[1] ?? '?';
-  failed   = (xml.match(/<!--\s*fail (\d+)/)        || [])[1] ?? '?';
-  skipped  = (xml.match(/<!--\s*skipped (\d+)/)     || [])[1] ?? '?';
+  passed   = parseInt((xml.match(/<!--\s*pass (\d+)/)    || [])[1] ?? '0');
+  failed   = parseInt((xml.match(/<!--\s*fail (\d+)/)    || [])[1] ?? '0');
+  skipped  = parseInt((xml.match(/<!--\s*skipped (\d+)/) || [])[1] ?? '0');
   const ms = parseFloat((xml.match(/<!--\s*duration_ms ([\d.]+)/) || [])[1] ?? '0');
   duration = (ms / 1000).toFixed(2) + 's';
 
@@ -77,7 +77,7 @@ const payload = {
       type: 'section',
       text: {
         type: 'mrkdwn',
-        text: `✅ *${passed}* passed   •   ❌ *${failed}* failed   •   ⏭️ *${skipped}* skipped   •   ⏱️ *${duration}*`,
+        text: `✅ *${passed}/${passed + failed + skipped}* passed   •   ❌ *${failed}* failed   •   ⏭️ *${skipped}* skipped   •   ⏱️ *${duration}*`,
       },
     },
     ...detailBlocks,

@@ -7,8 +7,13 @@
 
 import { readFileSync, writeFileSync, existsSync } from 'node:fs';
 
-const jobStatus = process.argv[2] || 'success';
-const runUrl    = process.argv[3] || '';
+const jobStatus   = process.argv[2] || 'success';
+const runUrl      = process.argv[3] || '';
+const branch      = process.argv[4] || '';
+const commitSha   = process.argv[5] || '';
+const commitMsg   = process.argv[6] || '';
+const actor       = process.argv[7] || '';
+const trigger     = process.argv[8] || '';
 
 const icon  = jobStatus === 'success' ? '✅' : '❌';
 let passed = '?', failed = '?', skipped = '?', duration = '?s';
@@ -76,18 +81,24 @@ const payload = {
       },
     },
     ...detailBlocks,
-    ...(runUrl ? [
-      { type: 'divider' },
-      {
-        type: 'actions',
-        elements: [{
-          type: 'button',
-          text: { type: 'plain_text', text: '🔗 View run on GitHub', emoji: true },
-          url: runUrl,
-          style: jobStatus === 'success' ? 'primary' : 'danger',
-        }],
-      },
-    ] : []),
+    { type: 'divider' },
+    {
+      type: 'context',
+      elements: [
+        { type: 'mrkdwn', text: `*Branch:* \`${branch}\`` },
+        { type: 'mrkdwn', text: `*Commit:* \`${commitSha.slice(0, 7)}\` — ${commitMsg}` },
+        { type: 'mrkdwn', text: `*By:* ${actor}   •   *Trigger:* ${trigger}` },
+      ],
+    },
+    ...(runUrl ? [{
+      type: 'actions',
+      elements: [{
+        type: 'button',
+        text: { type: 'plain_text', text: '🔗 View logs on GitHub', emoji: true },
+        url: runUrl,
+        style: jobStatus === 'success' ? 'primary' : 'danger',
+      }],
+    }] : []),
   ],
 };
 

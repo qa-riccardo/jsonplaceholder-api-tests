@@ -48,7 +48,12 @@ jobs:
         run: |
           node scripts/slack-payload.js \
             "${{ job.status }}" \
-            "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+            "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}" \
+            "${{ github.ref_name }}" \
+            "${{ github.sha }}" \
+            "${{ github.event.head_commit.message }}" \
+            "${{ github.actor }}" \
+            "${{ github.event_name }}"
           curl -s -X POST "${{ secrets.SLACK_WEBHOOK_URL }}" \
             -H "Content-Type: application/json" \
             -d @test-results/slack-payload.json

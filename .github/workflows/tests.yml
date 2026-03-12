@@ -43,7 +43,7 @@ jobs:
         with:
           name: Test Results
           path: test-results/junit.xml
-          reporter: jest-junit
+          reporter: java-junit
 
       - name: Write step summary
         if: always()

@@ -48,12 +48,10 @@ const payload = {
     },
     {
       type: 'section',
-      fields: [
-        { type: 'mrkdwn', text: `*✅ Passed*\n${passed}`   },
-        { type: 'mrkdwn', text: `*❌ Failed*\n${failed}`   },
-        { type: 'mrkdwn', text: `*⏭️ Skipped*\n${skipped}` },
-        { type: 'mrkdwn', text: `*⏱️ Duration*\n${duration}` },
-      ],
+      text: {
+        type: 'mrkdwn',
+        text: `✅ *${passed}* passed   •   ❌ *${failed}* failed   •   ⏭️ *${skipped}* skipped   •   ⏱️ *${duration}*`,
+      },
     },
     { type: 'divider' },
     {
